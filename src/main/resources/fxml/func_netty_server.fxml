@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox fx:id="serverContainer" spacing="30" alignment="CENTER"
+      fx:controller="fendoudebb.fx.tool.controller.FuncNettyServerController"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+
+    <TextField fx:id="listenIP" text="127.0.0.1" promptText="%func_netty_listen_ip" maxWidth="300"/>
+
+    <TextField fx:id="listenPort" text="8080" promptText="%func_netty_listen_port" maxWidth="300"/>
+
+    <HBox spacing="5" maxWidth="300" alignment="CENTER">
+        <Label text="%func_netty_listen_status_label"/>
+        <Label fx:id="listenStatus" text="%func_netty_listen_status_not_started"/>
+    </HBox>
+
+    <HBox spacing="5" maxWidth="300" alignment="CENTER">
+        <Label text="%func_netty_server_connections_label"/>
+        <Label fx:id="serverConnections"/>
+    </HBox>
+
+    <Button text="%func_netty_server_start" onAction="#startBtnClick"/>
+
+</VBox>

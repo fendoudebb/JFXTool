@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.TabPane?>
+<SplitPane fx:controller="fendoudebb.fx.tool.controller.MainController"
+           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+
+    <!--        dividerPositions="0.05,0.95"-->
+    <StackPane fx:id="funcTree" minWidth="100" maxWidth="300"/>
+    <StackPane minWidth="100">
+        <TabPane fx:id="funcArea"/>
+    </StackPane>
+</SplitPane>

@@ -1,0 +1,25 @@
+.tree-view {
+    -fx-background-color: white;
+    -fx-border-color: white;
+}
+
+.tree-view:focused {
+    -fx-border-color: white;
+}
+
+.tree-cell:focused {
+    -fx-border-color: white;
+}
+
+.list-view {
+    -fx-background-color: #F5F5F5;
+}
+
+.list-cell {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.list-cell:selected {
+    -fx-background-color: transparent;
+}

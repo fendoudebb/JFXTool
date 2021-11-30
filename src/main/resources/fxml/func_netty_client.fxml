@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<SplitPane fx:controller="fendoudebb.fx.tool.controller.FuncNettyClientController"
+           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+
+    <fx:define>
+        <ToggleGroup fx:id="tg"/>
+    </fx:define>
+
+    <StackPane>
+        <SplitPane fx:id="clientContainer" orientation="VERTICAL">
+            <StackPane minHeight="100">
+                <ListView fx:id="clientContent"/>
+            </StackPane>
+            <StackPane minHeight="100">
+                <StackPane alignment="BOTTOM_RIGHT">
+                    <TextArea fx:id="clientInput"/>
+                    <SplitMenuButton fx:id="clientSend" nodeOrientation="RIGHT_TO_LEFT" text="%func_netty_client_send">
+                        <items>
+                            <RadioMenuItem selected="true" toggleGroup="$tg" text="%func_netty_client_enter_send"
+                                           onAction="#onEnterSend"/>
+                            <RadioMenuItem toggleGroup="$tg" text="%func_netty_client_shift_enter_send"
+                                           onAction="#onShiftEnterSend"/>
+                        </items>
+                    </SplitMenuButton>
+                </StackPane>
+            </StackPane>
+        </SplitPane>
+    </StackPane>
+    <StackPane minWidth="100" maxWidth="300">
+        <VBox fx:id="configContainer" spacing="30" alignment="CENTER">
+
+            <TextField fx:id="listenIP" text="127.0.0.1" promptText="%func_netty_listen_ip" maxWidth="200"/>
+
+            <TextField fx:id="listenPort" text="8080" promptText="%func_netty_listen_port" maxWidth="200"/>
+
+            <HBox spacing="5" maxWidth="300" alignment="CENTER">
+                <Label text="%func_netty_listen_status_label"/>
+                <Label fx:id="listenStatus" text="%func_netty_listen_status_not_started"/>
+            </HBox>
+
+            <Button text="%func_netty_client_connect" onAction="#connectBtnClick"/>
+
+        </VBox>
+    </StackPane>
+
+
+</SplitPane>
