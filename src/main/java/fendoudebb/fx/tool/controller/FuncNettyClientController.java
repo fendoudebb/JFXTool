@@ -64,7 +64,7 @@ public class FuncNettyClientController implements Initializable {
                         if (!empty) {
                             VBox cellContainer = new VBox();
                             cellContainer.setAlignment(Pos.CENTER);
-                            cellContainer.setStyle("-fx-background-color: #F5F5F5;-fx-padding: 10 0 10 0");
+                            cellContainer.setStyle("-fx-background-color: #F5F5F5;");
 
                             HBox contentContainer = new HBox(10);
 
@@ -123,6 +123,7 @@ public class FuncNettyClientController implements Initializable {
                                     item.getTimestamp() - param.getItems().get(index - 1).getTimestamp() > Long.parseLong(Resource.config().getString("func_netty_show_ts_interval"))) {
                                 String time = DateFormatter.tsToString(item.getTimestamp());
                                 Label ts = new Label(time);
+                                VBox.setMargin(ts, new Insets(20, 0, 0, 0));
                                 // text fill must add the alpha bit
                                 ts.setStyle("-fx-text-fill: #FFFFFFFF;-fx-background-color: #DADADA;-fx-background-radius:3;-fx-padding: 3 5 3 5;");
                                 cellContainer.getChildren().addAll(ts, contentContainer);
