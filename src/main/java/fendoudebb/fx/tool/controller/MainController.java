@@ -114,7 +114,6 @@ public class MainController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
             String format = String.format(FORMAT_URL, fxmlName);
-            System.out.println(format);
             fxmlLoader.setLocation(getClass().getResource(format));
             fxmlLoader.setResources(resources);
             return fxmlLoader.load();

@@ -6,19 +6,17 @@ import fendoudebb.fx.tool.util.Resource;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
@@ -49,6 +47,7 @@ public class FuncNettyClientController implements Initializable {
         clientContainer.setDividerPositions(0.7, 0.3);
         listenStatus.setTextFill(Color.RED);
 
+        ContextMenu contextMenu = new ContextMenu();
         clientContent.setCellFactory(new Callback<>() {
             @Override
             public ListCell<ChatData> call(ListView<ChatData> param) {
@@ -76,45 +75,36 @@ public class FuncNettyClientController implements Initializable {
 
                             textFlow.getChildren().add(content);
 
-                            content.setOnMouseClicked(event -> {
+                            textFlow.setOnMouseClicked(event -> {
                                 if (event.getButton() == MouseButton.SECONDARY) {
-                                    ContextMenu contextMenu = new ContextMenu();
+                                    contextMenu.getItems().clear();
+//                                    contextMenu.hide();
                                     MenuItem copy = new MenuItem(resources.getString("func_netty_client_copy"));
                                     contextMenu.getItems().addAll(copy);
-                                    copy.setOnAction(event1 -> {
+                                    copy.setOnAction(e -> {
                                         Clipboard clipboard = Clipboard.getSystemClipboard();
                                         ClipboardContent clipboardContent = new ClipboardContent();
                                         clipboardContent.putString(content.getText());
                                         clipboard.setContent(clipboardContent);
                                     });
-                                    contextMenu.show(content, event.getScreenX(), event.getScreenY());
+                                    contextMenu.show(textFlow, event.getScreenX(), event.getScreenY());
                                 }
                             });
 
-                            Label avatar = new Label();
-                            avatar.setMaxSize(38, 38);
-                            StackPane frame = new StackPane();
-                            Rectangle rectangle = new Rectangle(38, 38);
-                            rectangle.setArcWidth(10);
-                            rectangle.setArcHeight(10);
-                            Label text = new Label(item.getUsername().substring(0, 1));
-                            text.setPadding(new Insets(5));
-                            frame.getChildren().addAll(rectangle, text);
-                            avatar.setGraphic(frame);
-                            Tooltip tooltip = new Tooltip(item.getUsername());
-                            Tooltip.install(avatar, tooltip);
+                            Image image = new Image(Resource.url("/assets/icon.png"));
+                            ImageView imageView = new ImageView(image);
+                            imageView.setFitWidth(38);
+                            imageView.setFitHeight(38);
 
                             if (item.isSelf()) {
-                                rectangle.setFill(Color.valueOf("#9EEA6A"));
                                 textFlow.setStyle("-fx-padding: 10;-fx-background-radius: 3;-fx-background-color: #9EEA6A");
                                 contentContainer.setAlignment(Pos.TOP_RIGHT);
-                                contentContainer.setPadding(new Insets(10, 10, 0, 150));
-                                contentContainer.getChildren().addAll(textFlow, avatar);
+                                contentContainer.setPadding(new Insets(10, 10, 10, 150));
+                                contentContainer.getChildren().addAll(textFlow, imageView);
                             } else {
-                                rectangle.setFill(Color.WHITE);
                                 textFlow.setStyle("-fx-padding: 10;-fx-background-radius: 3;-fx-background-color: white");
-                                contentContainer.setPadding(new Insets(10, 150, 0, 10));
-                                contentContainer.getChildren().addAll(avatar, textFlow);
+                                contentContainer.setPadding(new Insets(10, 150, 10, 10));
+                                contentContainer.getChildren().addAll(imageView, textFlow);
                             }
 
                             int index = this.getIndex();

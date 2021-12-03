@@ -39,16 +39,12 @@ public class App extends Application implements Initializable {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader();
         URL fxmlURL = getClass().getResource("/fxml/app.fxml");
-        URL cssURL = getClass().getResource("/css/style.css");
-        URL iconURL = getClass().getResource("/assets/icon.png");
         fxmlLoader.setLocation(fxmlURL);
         fxmlLoader.setResources(Resource.i18n());
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
-        assert cssURL != null;
-        scene.getStylesheets().add(cssURL.toExternalForm());
-        assert iconURL != null;
-        primaryStage.getIcons().add(new Image(iconURL.toExternalForm()));
+        scene.getStylesheets().add(Resource.url("/css/style.css"));
+        primaryStage.getIcons().add(new Image(Resource.url("/assets/icon.png")));
         primaryStage.setScene(scene);
         primaryStage.setTitle(Resource.config().getString("app_name"));
         primaryStage.setWidth(screenWidth / 1.2);

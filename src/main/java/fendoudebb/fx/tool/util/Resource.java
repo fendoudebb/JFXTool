@@ -1,5 +1,6 @@
 package fendoudebb.fx.tool.util;
 
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -13,6 +14,10 @@ public class Resource {
 
     public static ResourceBundle i18n() {
         return ResourceBundle.getBundle("i18n.language");
+    }
+
+    public static String url(String path) {
+        return Objects.requireNonNull(Resource.class.getResource(path)).toExternalForm();
     }
 
 }
