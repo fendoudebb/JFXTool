@@ -7,8 +7,6 @@
       fx:controller="fendoudebb.fx.tool.controller.FuncNettyServerController"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
 
-    <TextField fx:id="listenIP" text="127.0.0.1" promptText="%func_netty_listen_ip" maxWidth="300"/>
-
     <TextField fx:id="listenPort" text="8080" promptText="%func_netty_listen_port" maxWidth="300"/>
 
     <HBox spacing="5" maxWidth="300" alignment="CENTER">

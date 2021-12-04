@@ -34,6 +34,10 @@
     <StackPane minWidth="100" maxWidth="300">
         <VBox fx:id="configContainer" spacing="30" alignment="CENTER">
 
+            <TextField fx:id="username" text="username" promptText="%func_netty_client_username" maxWidth="200"/>
+
+            <TextField fx:id="password" text="password" promptText="%func_netty_client_password" maxWidth="200"/>
+
             <TextField fx:id="listenIP" text="127.0.0.1" promptText="%func_netty_listen_ip" maxWidth="200"/>
 
             <TextField fx:id="listenPort" text="8080" promptText="%func_netty_listen_port" maxWidth="200"/>

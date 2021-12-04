@@ -1,5 +1,9 @@
 package fendoudebb.fx.tool.controller;
 
+import fendoudebb.fx.tool.netty.server.ChatServer;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,7 +24,6 @@ import java.util.ResourceBundle;
 public class FuncNettyServerController implements Initializable {
 
     public VBox serverContainer;
-    public TextField listenIP;
     public TextField listenPort;
     public Label listenStatus;
     public Label serverConnections;
@@ -44,13 +47,31 @@ public class FuncNettyServerController implements Initializable {
     }
 
     public void startBtnClick(ActionEvent actionEvent) {
-        String address = listenIP.getText().concat(":").concat(listenPort.getText());
-        log.info("netty listen address#{}, {}", address, actionEvent);
-        listenStatus.setText(resources.getString("func_netty_listen_status_started"));
-        listenStatus.setTextFill(Color.GREEN);
-        ObservableList<Node> children = serverContainer.getChildren();
-        children.add(children.size() - 1, new Label("errorMsg"));
+        String port = listenPort.getText().strip();
+        if (port.isBlank()) {
+            return;
+        }
+        Button button = (Button) actionEvent.getSource();
+        button.setDisable(true);
+        ChatServer chatServer = new ChatServer();
+        new Thread(() -> chatServer.start(Integer.parseInt(port), future -> {
+            Platform.runLater(() -> {
+                listenStatus.setText(resources.getString("func_netty_listen_status_started"));
+                listenStatus.setTextFill(Color.GREEN);
+            });
 
-        connections.setValue(connections.get() + 1);
+        }, future -> Platform.runLater(() -> {
+            Platform.runLater(() -> {
+                listenStatus.setText(resources.getString("func_netty_listen_status_not_started"));
+                listenStatus.setTextFill(Color.RED);
+                button.setDisable(false);
+            });
+        }))).start();
+
+
+//        ObservableList<Node> children = serverContainer.getChildren();
+//        children.add(children.size() - 1, new Label("errorMsg"));
+
+//        connections.setValue(connections.get() + 1);
     }
 }

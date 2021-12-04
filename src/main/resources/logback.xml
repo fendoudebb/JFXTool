@@ -33,4 +33,5 @@
     </root>
 
     <logger name="fendoudebb.fx.tool" level="DEBUG"/>
+    <logger name="io.netty.handler.logging" level="DEBUG"/>
 </configuration>

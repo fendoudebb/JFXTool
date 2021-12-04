@@ -60,7 +60,7 @@ public class MainController implements Initializable {
         }));
 
         treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.isLeaf()) {
+            if (newValue != null && newValue.isLeaf()) {
 
                 String tabName = newValue.getValue().getTabName();
                 ObservableList<Tab> tabs = funcArea.getTabs();

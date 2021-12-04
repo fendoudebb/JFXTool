@@ -12,7 +12,9 @@ public class ChatData {
 
     private String content;
 
-    private Long timestamp;
+    private long timestamp;
+
+    private long sequenceId;
 
     private boolean self;
 

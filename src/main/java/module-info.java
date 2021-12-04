@@ -6,6 +6,7 @@ module JFXTool {
     requires javafx.fxml;
     requires lombok;
     requires org.slf4j;
+    requires io.netty.all;
 
     opens fendoudebb.fx.tool to javafx.fxml, javafx.graphics;
     opens fendoudebb.fx.tool.controller to javafx.fxml;

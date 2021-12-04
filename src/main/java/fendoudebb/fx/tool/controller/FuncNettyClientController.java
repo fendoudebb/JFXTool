@@ -1,19 +1,28 @@
 package fendoudebb.fx.tool.controller;
 
 import fendoudebb.fx.tool.bean.ChatData;
+import fendoudebb.fx.tool.netty.client.ChatClient;
+import fendoudebb.fx.tool.netty.client.queue.ChatMessageQueue;
+import fendoudebb.fx.tool.netty.message.ChatRequestMessage;
+import fendoudebb.fx.tool.netty.message.ChatResponseMessage;
 import fendoudebb.fx.tool.util.DateFormatter;
 import fendoudebb.fx.tool.util.Resource;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -36,11 +45,17 @@ public class FuncNettyClientController implements Initializable {
     public ListView<ChatData> clientContent;
     public TextArea clientInput;
     public SplitMenuButton clientSend;
+    public TextField username;
+    public TextField password;
+    public TextField listenIP;
+    public TextField listenPort;
     public Label listenStatus;
 
     private static final String LINE_SEPARATOR = "\n";
 
     private boolean useEnterSend = true;
+
+    private volatile Channel channel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -80,13 +95,22 @@ public class FuncNettyClientController implements Initializable {
                                     contextMenu.getItems().clear();
 //                                    contextMenu.hide();
                                     MenuItem copy = new MenuItem(resources.getString("func_netty_client_copy"));
-                                    contextMenu.getItems().addAll(copy);
+                                    contextMenu.getItems().add(copy);
                                     copy.setOnAction(e -> {
                                         Clipboard clipboard = Clipboard.getSystemClipboard();
                                         ClipboardContent clipboardContent = new ClipboardContent();
                                         clipboardContent.putString(content.getText());
                                         clipboard.setContent(clipboardContent);
                                     });
+
+                                    if (item.isSelf() && (System.currentTimeMillis() - item.getTimestamp() < 120000)) {
+                                        MenuItem recall = new MenuItem(resources.getString("func_netty_client_recall"));
+                                        recall.setOnAction(e -> {
+                                            log.info("recall");
+                                        });
+                                        contextMenu.getItems().add(recall);
+                                    }
+
                                     contextMenu.show(textFlow, event.getScreenX(), event.getScreenY());
                                 }
                             });
@@ -172,12 +196,18 @@ public class FuncNettyClientController implements Initializable {
     }
 
     private void send() {
+        if (channel == null) {
+            System.out.println("channel is null");
+            return;
+        }
         String text = clientInput.getText();
         clientInput.clear();
         if (!text.isBlank()) {
             text = text.stripTrailing();
+            ChatRequestMessage msg = new ChatRequestMessage();
+            msg.setContent(text);
+            channel.writeAndFlush(msg);
             ChatData d = new ChatData();
-            d.setUsername("Hello");
             d.setContent(text);
             d.setTimestamp(System.currentTimeMillis());
             d.setSelf(true);
@@ -186,6 +216,67 @@ public class FuncNettyClientController implements Initializable {
     }
 
     public void connectBtnClick(ActionEvent actionEvent) {
+        String username = this.username.getText().strip();
+        if (username.isBlank()) {
+            return;
+        }
+        String password = this.password.getText().strip();
+        if (password.isBlank()) {
+            return;
+        }
+        String ip = listenIP.getText().strip();
+        if (ip.isBlank()) {
+            return;
+        }
+        String port = listenPort.getText().strip();
+        if (port.isBlank()) {
+            return;
+        }
+
+        Button button = (Button) actionEvent.getSource();
+        button.setDisable(true);
+
+        ChatClient chatClient = new ChatClient();
+
+        Thread thread = new Thread(() -> {
+            while (true) {
+                try {
+                    ChatResponseMessage responseMessage = ChatMessageQueue.take();
+                    ChatData d = new ChatData();
+                    d.setUsername(responseMessage.getFrom());
+                    d.setContent(responseMessage.getContent());
+                    d.setTimestamp(responseMessage.getTimestamp());
+                    d.setSelf(responseMessage.getFrom().equals(username));
+                    Platform.runLater(() -> clientContent.getItems().add(d));
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        });
+        thread.start();
+
+        new Thread(() -> {
+            try {
+                chatClient.start(ip, Integer.parseInt(port), username, password, future -> {
+                    channel = future.channel();
+                    Platform.runLater(() -> {
+                        listenStatus.setText(Resource.i18n().getString("func_netty_listen_status_started"));
+                        listenStatus.setTextFill(Color.GREEN);
+                    });
+                }, future -> {
+                    channel = null;
+                    thread.interrupt();
+                    Platform.runLater(() -> {
+                        button.setDisable(false);
+                        listenStatus.setText(Resource.i18n().getString("func_netty_listen_status_not_started"));
+                        listenStatus.setTextFill(Color.RED);
+                    });
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
 
     }
 }
