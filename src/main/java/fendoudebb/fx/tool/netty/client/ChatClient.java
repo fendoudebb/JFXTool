@@ -15,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChatClient {
 
-    private Channel channel;
-
     public static void main(String[] args) {
         new ChatClient().start("localhost", 8080, "Tom", "123", null, null);
     }
@@ -52,7 +50,7 @@ public class ChatClient {
             if (openCallback != null) {
                 cf.addListener(openCallback);
             }
-            channel = cf.sync().channel();
+            Channel channel = cf.sync().channel();
             ChannelFuture channelFuture = channel.closeFuture();
             if (closeCallback != null) {
                 channelFuture.addListener(closeCallback);
@@ -63,10 +61,6 @@ public class ChatClient {
         } finally {
             group.shutdownGracefully();
         }
-    }
-
-    public Channel getChannel() throws InterruptedException {
-        return channel;
     }
 
 }

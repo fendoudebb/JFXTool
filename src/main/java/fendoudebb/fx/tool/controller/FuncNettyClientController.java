@@ -8,8 +8,6 @@ import fendoudebb.fx.tool.netty.message.ChatResponseMessage;
 import fendoudebb.fx.tool.util.DateFormatter;
 import fendoudebb.fx.tool.util.Resource;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -34,6 +32,7 @@ import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -242,6 +241,9 @@ public class FuncNettyClientController implements Initializable {
             while (true) {
                 try {
                     ChatResponseMessage responseMessage = ChatMessageQueue.take();
+                    if (Objects.equals(responseMessage.getFrom(), username)) {
+                        continue;
+                    }
                     ChatData d = new ChatData();
                     d.setUsername(responseMessage.getFrom());
                     d.setContent(responseMessage.getContent());

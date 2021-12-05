@@ -2,6 +2,7 @@ package fendoudebb.fx.tool;
 
 import fendoudebb.fx.tool.util.Resource;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -52,6 +53,13 @@ public class App extends Application implements Initializable {
         primaryStage.setMinWidth(300);
         primaryStage.setMinHeight(200);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        log.info("stop");
+//        Platform.exit();
+        System.exit(0);
     }
 
     public static void main(String[] args) {
