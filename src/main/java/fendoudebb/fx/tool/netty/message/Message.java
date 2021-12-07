@@ -17,5 +17,7 @@ public abstract class Message implements Serializable {
     public static final int LOGIN_RESPONSE_MESSAGE = 1;
     public static final int CHAT_REQUEST_MESSAGE = 2;
     public static final int CHAT_RESPONSE_MESSAGE = 3;
+    public static final int PING_MESSAGE = 4;
+    public static final int PONG_MESSAGE = 5;
 
 }

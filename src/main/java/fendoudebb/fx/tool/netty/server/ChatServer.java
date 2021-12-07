@@ -4,15 +4,15 @@ import fendoudebb.fx.tool.netty.protocol.MessageCodecShareable;
 import fendoudebb.fx.tool.netty.protocol.ProtocolFrameDecoder;
 import fendoudebb.fx.tool.netty.server.handler.ChatRequestMessageHandler;
 import fendoudebb.fx.tool.netty.server.handler.LoginRequestMessageHandler;
+import fendoudebb.fx.tool.netty.server.handler.QuitHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,6 +31,7 @@ public class ChatServer {
         MessageCodecShareable messageCodec = new MessageCodecShareable();
         LoginRequestMessageHandler loginRequestMessageHandler = new LoginRequestMessageHandler();
         ChatRequestMessageHandler chatRequestMessageHandler = new ChatRequestMessageHandler();
+        QuitHandler quitHandler = new QuitHandler();
 
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -39,11 +40,24 @@ public class ChatServer {
             serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
                 @Override
                 protected void initChannel(NioSocketChannel ch) throws Exception {
+                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0));
+                    ch.pipeline().addLast(new ChannelDuplexHandler() {
+                        @Override
+                        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+                            if (evt instanceof IdleStateEvent) {
+                                IdleStateEvent idleStateEvent = (IdleStateEvent) evt;
+                                if (idleStateEvent == IdleStateEvent.READER_IDLE_STATE_EVENT) {
+                                    log.info("5s have not received msg#{}",ctx.channel());
+                                }
+                            }
+                        }
+                    });
                     ch.pipeline().addLast(new ProtocolFrameDecoder());
                     ch.pipeline().addLast(loggingHandler);
                     ch.pipeline().addLast(messageCodec);
                     ch.pipeline().addLast(loginRequestMessageHandler);
                     ch.pipeline().addLast(chatRequestMessageHandler);
+                    ch.pipeline().addLast(quitHandler);
                 }
             });
 

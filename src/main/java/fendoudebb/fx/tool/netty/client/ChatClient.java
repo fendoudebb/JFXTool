@@ -3,6 +3,7 @@ package fendoudebb.fx.tool.netty.client;
 import fendoudebb.fx.tool.netty.client.handler.ChatResponseMessageHandler;
 import fendoudebb.fx.tool.netty.client.handler.LoginResponseMessageHandler;
 import fendoudebb.fx.tool.netty.message.LoginRequestMessage;
+import fendoudebb.fx.tool.netty.message.PingMessage;
 import fendoudebb.fx.tool.netty.protocol.MessageCodecShareable;
 import fendoudebb.fx.tool.netty.protocol.ProtocolFrameDecoder;
 import io.netty.bootstrap.Bootstrap;
@@ -10,6 +11,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,6 +38,19 @@ public class ChatClient {
                     ch.pipeline().addLast(new ProtocolFrameDecoder());
                     ch.pipeline().addLast(loggingHandler);
                     ch.pipeline().addLast(messageCodec);
+                    ch.pipeline().addLast(new IdleStateHandler(0, 3, 0));
+                    ch.pipeline().addLast(new ChannelDuplexHandler() {
+                        @Override
+                        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+                            if (evt instanceof IdleStateEvent) {
+                                IdleStateEvent idleStateEvent = (IdleStateEvent) evt;
+                                if (idleStateEvent == IdleStateEvent.WRITER_IDLE_STATE_EVENT) {
+                                    log.info("3s have not written msg#{}",ctx.channel());
+                                    ctx.writeAndFlush(new PingMessage());
+                                }
+                            }
+                        }
+                    });
                     ch.pipeline().addLast("client handler", new ChannelInboundHandlerAdapter() {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
